@@ -1,10 +1,16 @@
-FROM python:3.13-slim-bookworm
+FROM python:3.13.3-alpine
 
-WORKDIR /usr/src/app
+RUN pip install --upgrade pip
 
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN adduser -D worker
+USER worker
+WORKDIR /home/worker
 
-COPY . .
+COPY --chown=worker:worker requirements.txt requirements.txt
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+ENV PATH="/home/worker/.local/bin:${PATH}"
+
+COPY --chown=worker:worker . .
 
 CMD [ "python", "./ukw.py" ]

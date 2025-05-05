@@ -21,4 +21,13 @@ build:
 ## run: run the docker image as a container
 .PHONY: run
 run:
-	@docker run -it --rm -p 5000:5000 --name ${APP_NAME} ${IMAGE_NAME}:${IMAGE_TAG}
+	@docker run -d \
+  		--restart unless-stopped \
+  		-p 5000:5000 \
+		--name ${APP_NAME} ${IMAGE_NAME}:${IMAGE_TAG}
+
+## stop: stops and force-removes the container
+.PHONY: stop
+stop:
+	@docker stop ${APP_NAME}
+	@docker rm -f ${APP_NAME}

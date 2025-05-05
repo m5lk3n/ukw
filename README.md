@@ -25,13 +25,11 @@ make run
 
 Browse to http://localhost:5000/status/all (default).
 
-## References
+## Other References
 
-- https://uptime-kuma-api.readthedocs.io/en/
-- https://hub.docker.com/_/python/
+- [Run Python Applications as non-root user in Docker Containers — by example](https://medium.com/@DahlitzF/run-python-applications-as-non-root-user-in-docker-containers-by-example-cba46a0ff384)
 
 ## To do
 
-- Run container in `-d` mode
-- Run container under user
-- Fix "HTTP/2 stream 1 was not closed cleanly: INTERNAL_ERROR (err 2)"
+- Fix "HTTP/2 stream 1 was not closed cleanly: INTERNAL_ERROR (err 2)" when running behind a proxy (Caddy)
+- Read app tag from git tag
