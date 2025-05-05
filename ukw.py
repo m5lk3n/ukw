@@ -2,6 +2,7 @@ from uptime_kuma_api import UptimeKumaApi
 from flask import Flask, jsonify
 import os
 from dotenv import load_dotenv
+from flask import url_for
 
 load_dotenv()  # read environment variables from .env
 
@@ -33,6 +34,10 @@ def check_monitor_status():
 
 
 app = Flask(__name__)
+
+@app.route('/favicon.ico')
+def favicon():
+    return url_for('static', filename='image/favicon.ico')
 
 @app.route("/status/all", methods=["GET"])
 def status():
