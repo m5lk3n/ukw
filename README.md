@@ -4,7 +4,22 @@
 
 A containerized *U*ptime *K*uma *W*rapper for [uptime-kuma-api](https://github.com/lucasheld/uptime-kuma-api).
 
-It has one single endpoint and purpose: UKW looks through all monitors set up in an Uptime Kuma installation and returns "200, all up" if *all* are returning "UP" status. That's all folks.
+It has one single endpoint and purpose: UKW looks through all monitors set up in an Uptime Kuma installation and returns "200, all up" if *all* are returning "UP" status. 
+
+In other words, it turns
+
+![](uk.png)
+
+into
+
+```bash
+$ curl localhost:5000/status/all
+{"message":"all up"}
+```
+
+One single non-Up entry will result in an overall "503, not all up". 
+
+That's all folks.
 
 Note: For UKW to work, Uptime Kuma needs to be set up with authentication disabled! (I'm runnning my Uptime Kuma in a private [tailscale](https://tailscale.com/) net.)
 
@@ -25,11 +40,8 @@ make run
 
 Browse to http://localhost:5000/status/all (default).
 
+In my case, I use an ESP32-S3 to check this endpoint response and turn its LED green or red as a simple up/down indicator.
+
 ## Other References
 
 - [Run Python Applications as non-root user in Docker Containers — by example](https://medium.com/@DahlitzF/run-python-applications-as-non-root-user-in-docker-containers-by-example-cba46a0ff384)
-
-## To do
-
-- Fix "HTTP/2 stream 1 was not closed cleanly: INTERNAL_ERROR (err 2)" when running behind a proxy (Caddy)
-- Read app tag from git tag
