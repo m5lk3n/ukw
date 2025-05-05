@@ -29,3 +29,9 @@ Browse to http://localhost:5000/status/all (default).
 
 - https://uptime-kuma-api.readthedocs.io/en/
 - https://hub.docker.com/_/python/
+
+## To do
+
+- Run container in `-d` mode
+- Run container under user
+- Fix "HTTP/2 stream 1 was not closed cleanly: INTERNAL_ERROR (err 2)"
