@@ -4,20 +4,26 @@
 
 A containerized *U*ptime *K*uma *W*rapper for [uptime-kuma-api](https://github.com/lucasheld/uptime-kuma-api).
 
-It has one single endpoint and purpose: UKW looks through all monitors set up in an Uptime Kuma installation and returns "200, all up" if *all* are returning "UP" status. 
+It offers the following endpoints:
 
-In other words, it turns
+1. `status/all`: UKW looks through all active monitors set up in an Uptime Kuma installation and returns "200, all up" if *all* are returning "UP" status. 
 
-![](uk.png)
+    In other words, it turns
 
-into
+    ![](uk.png)
 
-```bash
-$ curl localhost:5000/status/all
-{"message":"all up"}
-```
+    into
 
-One non-Up monitor entry will result in an overall "503, not all up" regardless of the results from any other monitor.
+    ```bash
+    $ curl localhost:5000/status/all
+    {"message":"all up"}
+    ```
+
+   One non-Up monitor entry will result in an overall "503, not all up" regardless of the results from any other monitor.
+
+2. `status/monitors`: UKW looks through all monitors set up in an Uptime Kuma installation and returns a JSON array of all active monitors with their individual status (`up` or `down`).
+
+3. `version`
 
 That's all folks.
 
@@ -30,7 +36,7 @@ Disclaimer: I used ChatGPT to create logo and code.
 
 ## Usage
 
-Hint: You can customize your Uptime Kuma URL by running `echo "UPTIME_KUMA_URL=https://status.example.com" > .env`
+Hint: You can customize your Uptime Kuma URL by running `echo "UPTIME_KUMA_URL=https://status.example.com/api/status-page/my-status-page" > .env`
 
 Build image & run as a container:
 
@@ -48,3 +54,8 @@ Use `make stop` to stop and force-remove the container again.
 ## Other References
 
 - [Run Python Applications as non-root user in Docker Containers — by example](https://medium.com/@DahlitzF/run-python-applications-as-non-root-user-in-docker-containers-by-example-cba46a0ff384)
+
+## TODO
+
+- Swagger doc
+- Return proper JSON error message and HTTP response code in case of exception/error

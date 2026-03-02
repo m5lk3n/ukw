@@ -1,6 +1,15 @@
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
+
+ifeq (,$(wildcard ./.env))
+$(error .env file not found. Please create .env (or copy .env.example))
+endif
+
 APP_NAME=ukw
 IMAGE_NAME=lttl.dev/${APP_NAME}
-IMAGE_TAG=0.1.0
+IMAGE_TAG=${UKW_VERSION}
 
 ## help: print this help message
 .PHONY: help

@@ -6,31 +6,51 @@ from flask import url_for
 
 load_dotenv()  # read environment variables from .env
 
-def check_monitor_status():
+def are_all_up():
     try:
         uk_url = os.getenv('UPTIME_KUMA_URL', 'http://127.0.0.1:3001')
-        api = UptimeKumaApi(uk_url)
+        uk_api = UptimeKumaApi(uk_url)
 
         # no login supported/required, run behind tailscale ;-)
 
         # https://uptime-kuma-api.readthedocs.io/en/latest/api.html#uptime_kuma_api.UptimeKumaApi.get_monitors
-        monitors = api.get_monitors()
+        monitors = uk_api.get_monitors()
         all_up = True
         for monitor in monitors:
             if monitor['active']:
                 # https://uptime-kuma-api.readthedocs.io/en/latest/api.html#uptime_kuma_api.UptimeKumaApi.get_monitor_status
-                status = api.get_monitor_status(monitor['id'])
+                status = uk_api.get_monitor_status(monitor['id'])
                 # https://uptime-kuma-api.readthedocs.io/en/latest/api.html#uptime_kuma_api.MonitorStatus
                 if status != 1:  # 1 means "up"
                     all_up = False
                     break
 
-        api.disconnect()
+        uk_api.disconnect()
         return all_up
     
     except Exception as e:
-        print(f"Error checking monitor status: {e}")
+        print(f"Error checking status all: {e}")
         return False
+
+
+def get_active_monitors():
+    try:
+        uk_url = os.getenv('UPTIME_KUMA_URL', 'http://127.0.0.1:3001')
+        uk_api = UptimeKumaApi(uk_url)
+
+        monitors = uk_api.get_monitors()
+        result = {}
+        for monitor in monitors:
+            if monitor['active']:
+                status = uk_api.get_monitor_status(monitor['id'])
+                result[monitor['name']] = "up" if status == 1 else "down"
+
+        uk_api.disconnect()
+        return result
+
+    except Exception as e:
+        print(f"Error fetching active monitors: {e}")
+        return {}
 
 
 app = Flask(__name__)
@@ -39,9 +59,19 @@ app = Flask(__name__)
 def favicon():
     return url_for('static', filename='image/favicon.ico')
 
+@app.route("/version", methods=["GET"])
+def version():
+    version = os.getenv('UKW_VERSION', '0.1.0')
+    return jsonify({"version": version}), 200
+
+@app.route("/status/monitors", methods=["GET"])
+def monitors():
+    monitors = get_active_monitors()
+    return jsonify(monitors), 200
+
 @app.route("/status/all", methods=["GET"])
-def status():
-    if check_monitor_status():
+def status_all():
+    if are_all_up ():
         return jsonify({"message": "all up"}), 200
     else:
         return jsonify({"message": "not all up"}), 503
