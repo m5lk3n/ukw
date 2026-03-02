@@ -28,8 +28,13 @@ It offers the following endpoints:
 That's all folks.
 
 Notes:
+
 - For UKW to work, Uptime Kuma needs to be set up with authentication disabled! (I'm runnning my Uptime Kuma in a private [tailscale](https://tailscale.com/) net.)
+
+- UKW was tested with the following Uptime Kuma versions: 2.1.3
+
 - Depending on the amount of monitors set up, the underlying call may take a bit to return, i.e., it's a blocking, synchronous call.
+
 - In German, "UKW" stands for Very High Frequency. Hence, the logo.
 
 Disclaimer: I used ChatGPT to create logo and code.
@@ -51,11 +56,15 @@ In my case, I use an ESP32-S3 to check this endpoint response and turn its LED g
 
 Use `make stop` to stop and force-remove the container again.
 
+## Limitation
+
+UKW supports one Uptime Kuma status page.
+
 ## Other References
 
 - [Run Python Applications as non-root user in Docker Containers — by example](https://medium.com/@DahlitzF/run-python-applications-as-non-root-user-in-docker-containers-by-example-cba46a0ff384)
 
-## TODO
+## TODOs
 
 - Swagger doc
-- Return proper JSON error message and HTTP response code in case of exception/error
+- See `TODO` in code
