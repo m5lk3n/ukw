@@ -24,10 +24,12 @@ from config import WIFI_SSID, WIFI_PASSWORD, UKW_SERVER_URL, LED_PIN, POLL_INTER
 led = neopixel.NeoPixel(machine.Pin(LED_PIN), 1)
 
 COLOR_OFF    = (0, 0, 0)
-COLOR_GREEN  = (0, 20, 0)
-COLOR_RED    = (20, 0, 0)
-COLOR_BLUE   = (0, 0, 20)
-COLOR_YELLOW = (20, 12, 0)
+COLOR_GREEN  = (255, 128, 0)
+COLOR_RED    = (255, 0, 0)
+COLOR_BLUE   = (0, 0, 255)
+COLOR_YELLOW = (255, 150, 0)
+# COLOR_CYAN   = (0, 255, 255)
+# COLOR_PURPLE = (180, 0, 255)
 
 def set_led(color):
     led[0] = color
