@@ -171,7 +171,7 @@ class ST7789:
             for row in range(8):
                 bits = glyph[row]
                 for col in range(8):
-                    if bits & (0x80 >> col):
+                    if bits & (1 << col):
                         if scale == 1:
                             self.pixel(x + col, y + row, fg)
                         else:
@@ -291,3 +291,4 @@ _FONT = (
 def rgb565(r, g, b):
     """Convert 8-bit RGB to 16-bit RGB565 (big-endian for ST7789)."""
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+

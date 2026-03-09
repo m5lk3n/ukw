@@ -46,10 +46,11 @@ C_DKRED   = rgb565(50, 0, 0)
 led = neopixel.NeoPixel(machine.Pin(LED_PIN), 1)
 
 LED_OFF    = (0, 0, 0)
-LED_GREEN  = (0, 20, 0)
-LED_RED    = (20, 0, 0)
-LED_BLUE   = (0, 0, 20)
-LED_YELLOW = (20, 12, 0)
+# TODO: tweak these colours to look good on the actual LED (and maybe add a dimmed "all up" green?)
+LED_GREEN  = (255, 128, 0)
+LED_RED    = (255, 0, 0)
+LED_BLUE   = (0, 0, 255)
+LED_YELLOW = (128, 128, 0)
 
 
 def set_led(color):
