@@ -31,15 +31,20 @@ MicroPython — see https://docs.waveshare.com/ESP32-S3-Zero/Development-Environ
 
 1. Flash MicroPython onto the board (see link above).
 2. Copy `config.py`, `st7789.py`, and `main.py` to the board (e.g. via `mpremote` or Thonny).
-3. Edit `config.py` with your WiFi credentials and UKW server URL:
+3. Edit `.env` with your WiFi credentials and UKW server URL:
 
-```python
+```bash
 WIFI_SSID = "your-ssid"
 WIFI_PASSWORD = "your-password"
 UKW_SERVER_URL = "http://192.168.1.100:5000"
-POLL_INTERVAL = 30  # seconds between polls
+POLL_INTERVAL = 600  # seconds between polls
 ```
 
    Verify the LCD GPIO pins match your board revision (defaults are for the standard Waveshare ESP32-S3-LCD-1.47).
 
 4. Reset the board — `main.py` runs automatically on boot and the LCD will display each monitor with a green/red status indicator.
+
+## TODOs
+
+- Optimize code
+- Improve LED colors

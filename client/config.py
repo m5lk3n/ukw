@@ -1,12 +1,16 @@
+from dotenv import load_dotenv
+
+_env = load_dotenv()
+
 # WiFi credentials
-WIFI_SSID = "your-ssid"
-WIFI_PASSWORD = "your-password"
+WIFI_SSID = _env.get("WIFI_SSID", "your-ssid")
+WIFI_PASSWORD = _env.get("WIFI_PASSWORD", "your-password")
 
 # UKW server
-UKW_SERVER_URL = "http://192.168.1.100:5000"
+UKW_SERVER_URL = _env.get("UKW_SERVER_URL", "http://192.168.1.100:5000")
 
 # Polling interval in seconds
-POLL_INTERVAL = 30
+POLL_INTERVAL = int(_env.get("POLL_INTERVAL", "600"))
 
 # RGB LED (WS2812/NeoPixel) GPIO pin
 LED_PIN = 38
