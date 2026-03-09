@@ -35,8 +35,8 @@ See [server/README.md](server/README.md) for full details.
 ### Client
 
 1. Flash MicroPython onto the Waveshare ESP32-S3.
-2. Edit `client/config.py` with your WiFi and server settings.
-3. Copy `config.py` and `main.py` to the board.
+2. Create `client/.env` with your WiFi and server settings.
+3. Copy `client/*.py` to the board.
 4. Reset — the LED will start reflecting monitor status.
 
 See [client/README.md](client/README.md) for full details.
@@ -49,4 +49,6 @@ See [client/README.md](client/README.md) for full details.
 
 ## Disclaimer
 
-I used ChatGPT to create logo and code (for the Client code, Claude Opus 4.6 to be precise).
+Use at your own risk. I'm not responsible for anything here.
+
+I used ChatGPT to create the logo and Copilot to (vibe-)code (Claude Opus 4.6 for the Client code to be precise).
