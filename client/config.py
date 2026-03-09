@@ -27,10 +27,10 @@ LCD_BL_PIN  = 48
 LCD_SPI_ID = 1
 
 # LCD SPI frequency (Hz)
-LCD_SPI_FREQ = 80_000_000
+LCD_SPI_FREQ = 40000000 # 80_000_000
 
 # Display rotation (0 = portrait, 1 = landscape, 2 = portrait inverted, 3 = landscape inverted)
-LCD_ROTATION = 1
+LCD_ROTATION = 3
 
 # Font scale (1 = 8px, 2 = 16px, etc.)
 FONT_SCALE = 2

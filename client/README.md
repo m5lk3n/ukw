@@ -50,5 +50,6 @@ MicroPython — see https://docs.waveshare.com/ESP32-S3-Zero/Development-Environ
 
 ## TODOs
 
+- Paginate monitors
 - Optimize code
 - Improve LED colors
