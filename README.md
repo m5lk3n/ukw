@@ -17,7 +17,7 @@ In German, "UKW" stands for *Ultrakurzwelle* (Very High Frequency). Hence, the n
 
 **Server** — A containerized Flask app that wraps the Uptime Kuma API and exposes simplified REST endpoints (`/status/all`, `/status/monitors`, `/version`).
 
-**Client** — A MicroPython program running on a Waveshare ESP32-S3 board that polls `/status/monitors` and drives its RGB LED: green = all up, red = something is down.
+**Client** — A MicroPython program running on a Waveshare ESP32-S3 board that polls `/status/monitors` and displays each monitor's up/down status on the 1.47" LCD screen (with an RGB LED for aggregate status).
 
 ## Quick Start
 
