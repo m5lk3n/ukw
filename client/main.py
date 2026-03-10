@@ -23,7 +23,7 @@ from config import (
     LED_PIN, POLL_INTERVAL,
     LCD_DC_PIN, LCD_CS_PIN, LCD_CLK_PIN, LCD_DIN_PIN,
     LCD_RST_PIN, LCD_BL_PIN, LCD_SPI_ID, LCD_SPI_FREQ,
-    LCD_ROTATION, FONT_SCALE, PAGE_INTERVAL,
+    LCD_ROTATION, FONT_SCALE, PAGE_INTERVAL, UKW_CLIENT_VERSION,
 )
 from st7789 import ST7789, rgb565
 
@@ -77,6 +77,13 @@ lcd = ST7789(
     bl=machine.Pin(LCD_BL_PIN, machine.Pin.OUT),
     rotation=LCD_ROTATION,
 )
+
+bl_pin = machine.Pin(LCD_BL_PIN, machine.Pin.OUT)
+
+
+def set_backlight(on):
+    """Turn the LCD backlight on or off."""
+    bl_pin.value(1 if on else 0)
 
 
 # --- Display helpers -------------------------------------------------------
@@ -236,8 +243,8 @@ def poll_monitors():
 # --- Main loop -------------------------------------------------------------
 
 def main():
-    print("UKW " + UKW_CLIENT_VERSION + " Client starting")
-    show_message("UKW " + UKW_CLIENT_VERSION, C_WHITE)
+    print("UKW Client " + UKW_CLIENT_VERSION + " starting")
+    show_message("UKW Client " + UKW_CLIENT_VERSION, C_WHITE)
     time.sleep(1)
 
     wlan = connect_wifi()
@@ -255,9 +262,11 @@ def main():
             monitors = poll_monitors()
             all_up = all(s == "up" for s in monitors.values())
             set_led(LED_GREEN if all_up else LED_RED)
+            set_backlight(not all_up)
         except Exception as e:
             print("Error polling monitors:", e)
             set_led(LED_WHITE)
+            set_backlight(True)
             show_message("Error", C_RED)
             time.sleep(POLL_INTERVAL)
             continue
