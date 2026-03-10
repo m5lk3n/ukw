@@ -4,7 +4,7 @@ A MicroPython client for the Waveshare ESP32-S3 1.47" LCD board that polls the U
 
 The RGB LED also shows the aggregate status at a glance:
 
-| LED colour | Meaning |
+| LED color | Meaning |
 |------------|---------------------------------------------|
 | Green | All monitors are up |
 | Red | One or more monitors are down |

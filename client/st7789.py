@@ -83,7 +83,7 @@ class ST7789:
         for cmd, data, delay in (
             (_SWRESET, None,           150),
             (_SLPOUT,  None,           255),
-            (_COLMOD,  b'\x55',         10),   # 16-bit colour
+            (_COLMOD,  b'\x55',         10),   # 16-bit color
             (_MADCTL,  bytes([self._madctl]), 0),
             (_INVON,   None,            10),
             (_NORON,   None,            10),
