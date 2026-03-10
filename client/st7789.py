@@ -32,12 +32,6 @@ _MADCTL_MV  = 0x20
 _MADCTL_RGB = 0x00
 
 # Rotation presets  (MADCTL value, width, height, x-offset, y-offset)
-#_ROTATIONS = {
-#    0: (_MADCTL_RGB,                          172, 320, 34, 0),
-#    1: (_MADCTL_MV | _MADCTL_MX | _MADCTL_RGB, 320, 172,  0, 34),
-#    2: (_MADCTL_MY | _MADCTL_MX | _MADCTL_RGB, 172, 320, 34, 0),
-#    3: (_MADCTL_MV | _MADCTL_MY | _MADCTL_RGB, 320, 172,  0, 34),
-#}
 _ROTATIONS = {
     0: (_MADCTL_MX | _MADCTL_RGB,              172, 320, 34, 0),
     1: (_MADCTL_MV | _MADCTL_MX | _MADCTL_RGB, 320, 172,  0, 34),

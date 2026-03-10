@@ -23,7 +23,7 @@ from config import (
     LED_PIN, POLL_INTERVAL,
     LCD_DC_PIN, LCD_CS_PIN, LCD_CLK_PIN, LCD_DIN_PIN,
     LCD_RST_PIN, LCD_BL_PIN, LCD_SPI_ID, LCD_SPI_FREQ,
-    LCD_ROTATION, FONT_SCALE,
+    LCD_ROTATION, FONT_SCALE, PAGE_INTERVAL,
 )
 from st7789 import ST7789, rgb565
 
@@ -104,27 +104,49 @@ def draw_header():
     lcd.text(title, x, PADDING, C_WHITE, C_GREY, FONT_SCALE)
 
 
-def draw_monitors(monitors):
-    """Draw the full monitor list on screen.
+# --- Paging ----------------------------------------------------------------
+
+FOOTER_H = CHAR_H + PADDING * 2  # summary + page indicator at bottom
+
+
+def _rows_per_page():
+    """How many monitor rows fit between header and footer."""
+    usable = lcd.height - HEADER_H - PADDING - FOOTER_H
+    return max(1, usable // (ROW_H + 1))
+
+
+def page_count(total_monitors):
+    """Return the number of pages needed for *total_monitors* entries."""
+    rpp = _rows_per_page()
+    return max(1, (total_monitors + rpp - 1) // rpp)
+
+
+def draw_monitors(monitors, page=0):
+    """Draw one page of the monitor list on screen.
 
     *monitors* is a dict  {name: "up"|"down", ...}
+    *page* is the 0-based page index.
     """
+    items = sorted(monitors.items())
+    total = len(items)
+    rpp = _rows_per_page()
+    pages = page_count(total)
+    page = page % pages if pages else 0
+
+    start = page * rpp
+    end = min(start + rpp, total)
+    visible = items[start:end]
+
     lcd.fill(C_BLACK)
     draw_header()
 
     y = HEADER_H + PADDING
-    max_name_chars = (lcd.width - CHAR_W * 4 - PADDING * 3) // CHAR_W  # room for " UP" / " DN"
+    max_name_chars = (lcd.width - CHAR_W * 4 - PADDING * 3) // CHAR_W
 
-    for name, status in sorted(monitors.items()):
-        if y + ROW_H > lcd.height:
-            # Out of space — draw an ellipsis row
-            lcd.text("...", PADDING, y + PADDING, C_WHITE, C_BLACK, FONT_SCALE)
-            break
-
+    for name, status in visible:
         is_up = status == "up"
         row_bg = C_DKGREEN if is_up else C_DKRED
 
-        # Row background
         lcd.fill_rect(0, y, lcd.width, ROW_H, row_bg)
 
         # Status indicator dot
@@ -142,14 +164,16 @@ def draw_monitors(monitors):
         label_x = lcd.width - len(label) * CHAR_W - PADDING
         lcd.text(label, label_x, y + PADDING, C_GREEN if is_up else C_RED, row_bg, FONT_SCALE)
 
-        y += ROW_H + 1  # 1px gap between rows
+        y += ROW_H + 1
 
-    # Summary line at bottom
+    # Footer: summary + page indicator
     up_count = sum(1 for s in monitors.values() if s == "up")
-    total = len(monitors)
-    summary = "{}/{} up".format(up_count, total)
+    if pages > 1:
+        summary = "{}/{} up  [{}/{}]".format(up_count, total, page + 1, pages)
+    else:
+        summary = "{}/{} up".format(up_count, total)
     sy = lcd.height - CHAR_H - PADDING
-    lcd.fill_rect(0, sy - PADDING, lcd.width, CHAR_H + PADDING * 2, C_GREY)
+    lcd.fill_rect(0, sy - PADDING, lcd.width, FOOTER_H, C_GREY)
     sx = max(0, (lcd.width - len(summary) * CHAR_W) // 2)
     color = C_GREEN if up_count == total else C_RED
     lcd.text(summary, sx, sy, color, C_GREY, FONT_SCALE)
@@ -222,19 +246,33 @@ def main():
         time.sleep(10)
         machine.reset()
 
+    monitors = None
+
     while True:
+        # --- poll server ---
         set_led(LED_BLUE)
         try:
             monitors = poll_monitors()
             all_up = all(s == "up" for s in monitors.values())
             set_led(LED_GREEN if all_up else LED_RED)
-            draw_monitors(monitors)
         except Exception as e:
             print("Error polling monitors:", e)
             set_led(LED_YELLOW)
             show_message("Error", C_YELLOW)
+            time.sleep(POLL_INTERVAL)
+            continue
 
-        time.sleep(POLL_INTERVAL)
+        # --- page through results until next poll ---
+        pages = page_count(len(monitors))
+        current_page = 0
+        elapsed = 0
+
+        while elapsed < POLL_INTERVAL:
+            draw_monitors(monitors, current_page)
+            wait = PAGE_INTERVAL if pages > 1 else POLL_INTERVAL - elapsed
+            time.sleep(wait)
+            elapsed += wait
+            current_page = (current_page + 1) % pages
 
 
 main()

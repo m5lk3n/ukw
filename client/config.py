@@ -34,3 +34,6 @@ LCD_ROTATION = 3
 
 # Font scale (1 = 8px, 2 = 16px, etc.)
 FONT_SCALE = 2
+
+# Seconds each page is shown before advancing to the next
+PAGE_INTERVAL = 5

@@ -48,8 +48,11 @@ MicroPython — see https://docs.waveshare.com/ESP32-S3-Zero/Development-Environ
 
 5. Reset the board — `main.py` runs automatically on boot and the LCD will display each monitor with a green/red status indicator.
 
+## Known Bugs
+
+- Portrait modes are mirrored
+
 ## TODOs
 
-- Paginate monitors
 - Optimize code
 - Improve LED colors
