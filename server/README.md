@@ -44,7 +44,7 @@ make build
 make run
 ```
 
-Browse to http://localhost:5000/status/all (default).
+Browse to http://localhost:5000/status/monitors.
 
 In my case, I use an ESP32-S3 to check this endpoint response and turn its LED green or red as a simple up/down indicator.
 
