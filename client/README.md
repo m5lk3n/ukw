@@ -59,4 +59,4 @@ MicroPython — see https://docs.waveshare.com/ESP32-S3-Zero/Development-Environ
 
 - Optimize code
 
-- Add a license
+- See `TODO` in code

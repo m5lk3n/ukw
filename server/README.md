@@ -29,7 +29,7 @@ Notes:
 
 - For UKW to work, Uptime Kuma needs to be set up with authentication disabled! (I'm runnning my Uptime Kuma in a private [tailscale](https://tailscale.com/) net.)
 
-- UKW was last tested with the following Uptime Kuma versions: 2.1.3
+- UKW was last tested with the following Uptime Kuma versions: 2.1.3, 2.2.0
 
 - Depending on the amount of monitors set up, the underlying call may take a bit to return, i.e., it's a blocking, synchronous call.
 
@@ -60,5 +60,6 @@ UKW supports one Uptime Kuma status page.
 
 ## TODOs
 
-- Swagger doc
+- Add Swagger doc
+
 - See `TODO` in code
