@@ -56,4 +56,6 @@ MicroPython — see https://docs.waveshare.com/ESP32-S3-Zero/Development-Environ
 
 ## TODOs
 
+- Add photos to README
+
 - See `TODO` in code
