@@ -33,7 +33,7 @@ LCD_SPI_ID = 1
 LCD_SPI_FREQ = 40000000 # 80_000_000
 
 # LCD backlight: True = always on, False = only on when a monitor is down
-LCD_BACKLIGHT_ALWAYS_ON = bool(_env.get("LCD_BACKLIGHT_ALWAYS_ON", "False"))
+LCD_BACKLIGHT_ALWAYS_ON = _env.get("LCD_BACKLIGHT_ALWAYS_ON", "False").strip().lower() in ("1", "true", "yes", "on")
 
 # Display rotation (0 = portrait, 1 = landscape, 2 = portrait inverted, 3 = landscape inverted)
 LCD_ROTATION = 3 # TODO/FIXME: portrait modes are mirrored/flipped, need to figure out why
