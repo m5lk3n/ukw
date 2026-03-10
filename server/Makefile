@@ -9,7 +9,7 @@ endif
 
 APP_NAME=ukw
 IMAGE_NAME=lttl.dev/${APP_NAME}
-IMAGE_TAG=${UKW_VERSION}
+IMAGE_TAG=${UKW_SERVER_VERSION}
 
 ## help: print this help message
 .PHONY: help

@@ -13,23 +13,23 @@ import time
 from struct import pack
 
 # ST7789 commands
-_NOP       = 0x00
-_SWRESET   = 0x01
-_SLPOUT    = 0x11
-_NORON     = 0x13
-_INVON     = 0x21
-_DISPON    = 0x29
-_CASET     = 0x2A
-_RASET     = 0x2B
-_RAMWR     = 0x2C
-_MADCTL    = 0x36
-_COLMOD    = 0x3A
+_NOP       = const(0x00)
+_SWRESET   = const(0x01)
+_SLPOUT    = const(0x11)
+_NORON     = const(0x13)
+_INVON     = const(0x21)
+_DISPON    = const(0x29)
+_CASET     = const(0x2A)
+_RASET     = const(0x2B)
+_RAMWR     = const(0x2C)
+_MADCTL    = const(0x36)
+_COLMOD    = const(0x3A)
 
 # MADCTL flags
-_MADCTL_MY  = 0x80
-_MADCTL_MX  = 0x40
-_MADCTL_MV  = 0x20
-_MADCTL_RGB = 0x00
+_MADCTL_MY  = const(0x80)
+_MADCTL_MX  = const(0x40)
+_MADCTL_MV  = const(0x20)
+_MADCTL_RGB = const(0x00)
 
 # Rotation presets  (MADCTL value, width, height, x-offset, y-offset)
 _ROTATIONS = {
@@ -52,8 +52,11 @@ class ST7789:
         madctl, self.width, self.height, self._xoff, self._yoff = _ROTATIONS[rotation]
         self._madctl = madctl
 
+        # Pre-allocate reusable buffers
         self._buf1 = bytearray(1)
-        self._buf2 = bytearray(2)
+        self._buf4 = bytearray(4)       # for CASET/RASET data (2× uint16)
+        self._buf2 = bytearray(2)       # for single pixel
+        self._win_buf = bytearray(4)    # second window buffer
 
         self.reset()
         self._init_display()
@@ -101,26 +104,46 @@ class ST7789:
     # --- drawing primitives ---------------------------------------------------
 
     def _set_window(self, x0, y0, x1, y1):
-        x0 += self._xoff; x1 += self._xoff
-        y0 += self._yoff; y1 += self._yoff
+        # Use pre-allocated buffers to avoid pack() allocations
+        xoff = self._xoff
+        yoff = self._yoff
+        buf = self._buf4
+
         self._write_cmd(_CASET)
-        self._write_data(pack('>HH', x0, x1))
+        x0 += xoff; x1 += xoff
+        buf[0] = x0 >> 8; buf[1] = x0 & 0xFF
+        buf[2] = x1 >> 8; buf[3] = x1 & 0xFF
+        self._write_data(buf)
+
         self._write_cmd(_RASET)
-        self._write_data(pack('>HH', y0, y1))
+        y0 += yoff; y1 += yoff
+        buf[0] = y0 >> 8; buf[1] = y0 & 0xFF
+        buf[2] = y1 >> 8; buf[3] = y1 & 0xFF
+        self._write_data(buf)
+
         self._write_cmd(_RAMWR)
 
     def fill(self, color):
         """Fill the entire screen with *color* (RGB565)."""
         self._set_window(0, 0, self.width - 1, self.height - 1)
-        # send in chunks to avoid huge alloc
-        chunk_lines = 8
-        line_bytes = self.width * 2
-        buf = bytes([color >> 8, color & 0xFF]) * (self.width * chunk_lines)
+        hi = color >> 8
+        lo = color & 0xFF
+        # Larger chunks = fewer SPI transactions (trade ~5 KB RAM for speed)
+        chunk_lines = 32
+        w = self.width
+        line_bytes = w * 2
+        buf = bytearray(line_bytes * chunk_lines)
+        # Fill buffer with color pattern
+        for i in range(0, len(buf), 2):
+            buf[i] = hi
+            buf[i + 1] = lo
         lines_left = self.height
-        while lines_left > 0:
-            n = min(chunk_lines, lines_left)
-            self._write_data(buf[:n * line_bytes])
-            lines_left -= n
+        while lines_left >= chunk_lines:
+            self._write_data(buf)
+            lines_left -= chunk_lines
+        if lines_left > 0:
+            mv = memoryview(buf)[:lines_left * line_bytes]
+            self._write_data(mv)
 
     def fill_rect(self, x, y, w, h, color):
         """Fill a rectangle at (x, y) of size w×h with *color*."""
@@ -131,58 +154,131 @@ class ST7789:
         if w <= 0 or h <= 0:
             return
         self._set_window(x, y, x + w - 1, y + h - 1)
-        chunk_lines = 8
+        hi = color >> 8
+        lo = color & 0xFF
+        chunk_lines = min(32, h)
         line_bytes = w * 2
-        buf = bytes([color >> 8, color & 0xFF]) * (w * chunk_lines)
+        buf = bytearray(line_bytes * chunk_lines)
+        for i in range(0, len(buf), 2):
+            buf[i] = hi
+            buf[i + 1] = lo
         lines_left = h
-        while lines_left > 0:
-            n = min(chunk_lines, lines_left)
-            self._write_data(buf[:n * line_bytes])
-            lines_left -= n
+        while lines_left >= chunk_lines:
+            self._write_data(buf)
+            lines_left -= chunk_lines
+        if lines_left > 0:
+            mv = memoryview(buf)[:lines_left * line_bytes]
+            self._write_data(mv)
 
     def pixel(self, x, y, color):
         self._set_window(x, y, x, y)
-        self._write_data(pack('>H', color))
+        buf = self._buf2
+        buf[0] = color >> 8
+        buf[1] = color & 0xFF
+        self._write_data(buf)
 
     # --- text -----------------------------------------------------------------
 
     def draw_char(self, ch, x, y, fg, bg=None, scale=1):
         """Draw a single character using the built-in 8×8 font."""
-        idx = min(max(ord(ch) - 32, 0), len(_FONT) - 1)
+        idx = ord(ch) - 32
+        if idx < 0 or idx >= len(_FONT):
+            idx = 0
         glyph = _FONT[idx]
         char_w = 8 * scale
         char_h = 8 * scale
+
+        fg_hi = fg >> 8
+        fg_lo = fg & 0xFF
+
         if bg is not None:
+            bg_hi = bg >> 8
+            bg_lo = bg & 0xFF
             self._set_window(x, y, x + char_w - 1, y + char_h - 1)
             buf = bytearray(char_w * char_h * 2)
             pos = 0
-            for row in range(8):
-                bits = glyph[row]
-                for _ in range(scale):
+
+            if scale == 1:
+                # Fast path for scale=1: unrolled, no inner loops
+                for row in range(8):
+                    bits = glyph[row]
                     for col in range(8):
-                        c = fg if bits & (1 << col) else bg # c = fg if bits & (0x80 >> col) else bg
-                        for __ in range(scale):
-                            buf[pos]     = c >> 8
-                            buf[pos + 1] = c & 0xFF
+                        if bits & (1 << col):
+                            buf[pos] = fg_hi; buf[pos + 1] = fg_lo
+                        else:
+                            buf[pos] = bg_hi; buf[pos + 1] = bg_lo
+                        pos += 2
+            else:
+                for row in range(8):
+                    bits = glyph[row]
+                    # Build one source row, then duplicate for scale
+                    row_start = pos
+                    for col in range(8):
+                        if bits & (1 << col):
+                            hi, lo = fg_hi, fg_lo
+                        else:
+                            hi, lo = bg_hi, bg_lo
+                        for _ in range(scale):
+                            buf[pos] = hi; buf[pos + 1] = lo
                             pos += 2
+                    # Duplicate row (scale - 1) more times
+                    row_len = char_w * 2
+                    for _ in range(scale - 1):
+                        buf[pos:pos + row_len] = buf[row_start:row_start + row_len]
+                        pos += row_len
             self._write_data(buf)
         else:
-            for row in range(8):
-                bits = glyph[row]
-                for col in range(8):
-                    if bits & (1 << col): #  if bits & (0x80 >> col):
-                        if scale == 1:
-                            self.pixel(x + col, y + row, fg)
+            # No background — only draw foreground pixels
+            if scale == 1:
+                # Batch foreground pixels per row using fill_rect for spans
+                for row in range(8):
+                    bits = glyph[row]
+                    if bits == 0:
+                        continue
+                    col = 0
+                    while col < 8:
+                        if bits & (1 << col):
+                            # Find span of consecutive set bits
+                            start = col
+                            col += 1
+                            while col < 8 and (bits & (1 << col)):
+                                col += 1
+                            span = col - start
+                            if span == 1:
+                                self.pixel(x + start, y + row, fg)
+                            else:
+                                self.fill_rect(x + start, y + row, span, 1, fg)
                         else:
-                            self.fill_rect(x + col * scale, y + row * scale, scale, scale, fg)
+                            col += 1
+            else:
+                for row in range(8):
+                    bits = glyph[row]
+                    if bits == 0:
+                        continue
+                    col = 0
+                    while col < 8:
+                        if bits & (1 << col):
+                            start = col
+                            col += 1
+                            while col < 8 and (bits & (1 << col)):
+                                col += 1
+                            self.fill_rect(
+                                x + start * scale, y + row * scale,
+                                (col - start) * scale, scale, fg)
+                        else:
+                            col += 1
 
     def text(self, s, x, y, fg, bg=None, scale=1):
         """Draw a string. Returns the x position after the last character."""
+        char_w = 8 * scale
+        limit = self.width
+        # Local reference for speed in tight loop
+        _draw_char = self.draw_char
         for ch in s:
-            if x + 8 * scale > self.width:
+            if x + char_w > limit:
                 break
-            self.draw_char(ch, x, y, fg, bg, scale)
-            x += 8 * scale
+            _draw_char(ch, x, y, fg, bg, scale)
+            x += char_w
         return x
 
 

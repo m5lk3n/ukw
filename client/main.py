@@ -236,8 +236,8 @@ def poll_monitors():
 # --- Main loop -------------------------------------------------------------
 
 def main():
-    print("UKW Client starting")
-    show_message("UKW", C_WHITE)
+    print("UKW " + UKW_CLIENT_VERSION + " Client starting")
+    show_message("UKW " + UKW_CLIENT_VERSION, C_WHITE)
     time.sleep(1)
 
     wlan = connect_wifi()

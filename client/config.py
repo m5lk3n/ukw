@@ -2,11 +2,9 @@ from dotenv import load_dotenv
 
 _env = load_dotenv()
 
-# WiFi credentials
 WIFI_SSID = _env.get("WIFI_SSID", "your-ssid")
 WIFI_PASSWORD = _env.get("WIFI_PASSWORD", "your-password")
 
-# UKW server
 UKW_SERVER_URL = _env.get("UKW_SERVER_URL", "http://192.168.1.100:5000")
 
 # Server polling interval in seconds
@@ -14,6 +12,8 @@ POLL_INTERVAL = int(_env.get("POLL_INTERVAL", "600"))
 
 # Seconds each monitor page is shown before advancing to the next
 PAGE_INTERVAL = int(_env.get("PAGE_INTERVAL", "5"))
+
+UKW_CLIENT_VERSION = _env.get("UKW_CLIENT_VERSION", "dev")
 
 # RGB LED (WS2812/NeoPixel) GPIO pin
 LED_PIN = 38

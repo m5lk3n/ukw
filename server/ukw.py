@@ -51,7 +51,7 @@ def favicon():
 
 @app.route("/version", methods=["GET"])
 def version():
-    version = os.getenv('UKW_VERSION', '0.1.0')
+    version = os.getenv('UKW_SERVER_VERSION', 'dev')
     return jsonify({"version": version}), 200
 
 @app.route("/status/monitors", methods=["GET"])

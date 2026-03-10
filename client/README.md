@@ -57,6 +57,4 @@ MicroPython — see https://docs.waveshare.com/ESP32-S3-Zero/Development-Environ
 
 - Show LCD only if LED is red
 
-- Optimize code
-
 - See `TODO` in code
