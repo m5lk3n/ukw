@@ -9,7 +9,7 @@ The RGB LED also shows the aggregate status at a glance:
 | Green | All monitors are up |
 | Red | One or more monitors are down |
 | Blue | Polling / connecting to WiFi |
-| Yellow | Error (server unreachable, bad response) |
+| White | Error (server unreachable, bad response) |
 
 ## Hardware
 
@@ -39,7 +39,8 @@ MicroPython — see https://docs.waveshare.com/ESP32-S3-Zero/Development-Environ
     WIFI_SSID="your-ssid"
     WIFI_PASSWORD="your-password"
     UKW_SERVER_URL="http://192.168.1.100:5000"
-    POLL_INTERVAL=600 # seconds between polls (defaults to 600)
+    POLL_INTERVAL=600 # seconds between server polls (defaults to 600)
+    PAGE_INTERAL=5 # seconds between monitor pagination (defaults to 5)
     ```
 
 3. Edit `config.py` and verify the LCD GPIO pins match your board revision (defaults are for the standard Waveshare ESP32-S3-LCD-1.47).
@@ -48,11 +49,10 @@ MicroPython — see https://docs.waveshare.com/ESP32-S3-Zero/Development-Environ
 
 5. Reset the board — `main.py` runs automatically on boot and the LCD will display each monitor with a green/red status indicator.
 
-## Known Bugs
+## Known Bug
 
 - Portrait modes are mirrored
 
 ## TODOs
 
 - Optimize code
-- Improve LED colors

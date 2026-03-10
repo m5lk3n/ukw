@@ -9,8 +9,11 @@ WIFI_PASSWORD = _env.get("WIFI_PASSWORD", "your-password")
 # UKW server
 UKW_SERVER_URL = _env.get("UKW_SERVER_URL", "http://192.168.1.100:5000")
 
-# Polling interval in seconds
+# Server polling interval in seconds
 POLL_INTERVAL = int(_env.get("POLL_INTERVAL", "600"))
+
+# Seconds each monitor page is shown before advancing to the next
+PAGE_INTERVAL = int(_env.get("PAGE_INTERVAL", "5"))
 
 # RGB LED (WS2812/NeoPixel) GPIO pin
 LED_PIN = 38
@@ -30,10 +33,7 @@ LCD_SPI_ID = 1
 LCD_SPI_FREQ = 40000000 # 80_000_000
 
 # Display rotation (0 = portrait, 1 = landscape, 2 = portrait inverted, 3 = landscape inverted)
-LCD_ROTATION = 3
+LCD_ROTATION = 3 # TODO/FIXME: portrait modes are mirrored/flipped, need to figure out why
 
 # Font scale (1 = 8px, 2 = 16px, etc.)
 FONT_SCALE = 2
-
-# Seconds each page is shown before advancing to the next
-PAGE_INTERVAL = 5

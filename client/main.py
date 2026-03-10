@@ -8,7 +8,7 @@ The RGB LED still shows the aggregate status:
   - Green : all monitors are up
   - Red   : one or more monitors are down
   - Blue  : polling / connecting
-  - Yellow: error (server unreachable, bad response, etc.)
+  - White : error (server unreachable, bad response, etc.)
 """
 
 import machine
@@ -32,10 +32,10 @@ from st7789 import ST7789, rgb565
 
 C_BLACK   = rgb565(0, 0, 0)
 C_WHITE   = rgb565(255, 255, 255)
+#C_WHITE   = rgb565(176, 176, 176)
 C_GREEN   = rgb565(0, 200, 0)
 C_RED     = rgb565(220, 0, 0)
 C_BLUE    = rgb565(40, 80, 220)
-C_YELLOW  = rgb565(220, 180, 0)
 C_GREY    = rgb565(60, 60, 60)
 C_DKGREEN = rgb565(0, 40, 0)
 C_DKRED   = rgb565(50, 0, 0)
@@ -46,11 +46,11 @@ C_DKRED   = rgb565(50, 0, 0)
 led = neopixel.NeoPixel(machine.Pin(LED_PIN), 1)
 
 LED_OFF    = (0, 0, 0)
-# TODO: tweak these colours to look good on the actual LED (and maybe add a dimmed "all up" green?)
-LED_GREEN  = (255, 128, 0)
-LED_RED    = (255, 0, 0)
-LED_BLUE   = (0, 0, 255)
-LED_YELLOW = (128, 128, 0)
+# GRB, NOT RGB!
+LED_GREEN  = (20, 0, 0) # "very dim" green
+LED_RED    = (0, 20, 0) # "very dim" red
+LED_BLUE   = (0, 0, 20) # "very dim" blue
+LED_WHITE  = (40, 40, 40) # "dim" white
 
 
 def set_led(color):
@@ -199,7 +199,7 @@ def connect_wifi():
         retries += 1
         if retries > 30:
             print("WiFi connection failed")
-            set_led(LED_YELLOW)
+            set_led(LED_WHITE)
             show_message("WiFi FAIL", C_RED)
             return None
         time.sleep(1)
@@ -257,8 +257,8 @@ def main():
             set_led(LED_GREEN if all_up else LED_RED)
         except Exception as e:
             print("Error polling monitors:", e)
-            set_led(LED_YELLOW)
-            show_message("Error", C_YELLOW)
+            set_led(LED_WHITE)
+            show_message("Error", C_RED)
             time.sleep(POLL_INTERVAL)
             continue
 
@@ -276,3 +276,4 @@ def main():
 
 
 main()
+
