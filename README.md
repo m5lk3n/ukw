@@ -4,7 +4,7 @@
 
 *U*ptime *K*uma *W*rapper — a lightweight server + hardware client that turns your [Uptime Kuma](https://github.com/louislam/uptime-kuma) monitor statuses into a simple physical indicator.
 
-In German, "UKW" stands for *Ultrakurzwelle* (Very High Frequency). Hence, the name.
+In German, "UKW" stands for *Ultrakurzwelle* (Very High Frequency). Hence, the name and the logo.
 
 ## Architecture
 

@@ -58,4 +58,6 @@ MicroPython — see https://docs.waveshare.com/ESP32-S3-Zero/Development-Environ
 
 - Add photos to README
 
+- Support for sleep mode (?)
+
 - See `TODO` in code
