@@ -10,6 +10,7 @@ COPY --chown=worker:worker requirements.txt requirements.txt
 RUN pip install --user --no-cache-dir -r requirements.txt
 
 ENV PATH="/home/worker/.local/bin:${PATH}"
+ENV PYTHONUNBUFFERED=1
 
 COPY --chown=worker:worker . .
 

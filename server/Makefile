@@ -32,6 +32,7 @@ build:
 run:
 	@docker run -d \
   		--restart unless-stopped \
+		--env-file .env \
   		-p 5000:5000 \
 		--name ${APP_NAME} ${IMAGE_NAME}:${IMAGE_TAG}
 
